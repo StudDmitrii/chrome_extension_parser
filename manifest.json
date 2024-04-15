@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "ext-test",
+    "version": "1.0",
+    "action":{},
+    "side_panel":{
+        "default_path": "view/index.html"
+    },
+    "background": {
+        "service_worker": "bg/bg.js"
+    },
+    "permissions": [
+        "activeTab",
+        "scripting",
+        "sidePanel",
+        "storage"
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ]
+}

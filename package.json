@@ -1,0 +1,19 @@
+{
+  "name": "ext-test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StudDmitrii/chrome_extension_parser.git"
+  },
+  "bugs": {
+    "url": "https://github.com/StudDmitrii/chrome_extension_parser/issues"
+  },
+  "homepage": "https://github.com/StudDmitrii/chrome_extension_parser#readme",
+  "description": ""
+}

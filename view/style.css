@@ -1,0 +1,24 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body{
+    background-color: #F8F3EC;
+}
+
+.task{
+    background-color: #F0E401;
+    padding: 2%;
+}
+
+.task-1{
+    display: grid;
+    grid-template-rows: auto auto;
+    grid-template-columns: 1fr 1fr;
+}
+
+.task-title{
+    grid-column: 1 / 3;
+}
