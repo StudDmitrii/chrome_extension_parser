@@ -34,7 +34,7 @@ class PageStyler {
 class SelectorManager {
     static getSelector(node, node_list=[], selectors=[[],[],[]], skip=1, card_selector_found=false){
 
-        const return_value = selectors.map((el)=>el.join('>')) // global_selector, card_selector, element_selector
+        const prepared_selectors = selectors.map((el)=>el.join('>')) // global_selector, card_selector, element_selector
         node_list.unshift(node)
     
         const tag_name = node.tagName.toLowerCase()
@@ -42,21 +42,21 @@ class SelectorManager {
         const nth_selector = `:nth-child(${getNodeIndex(node)})`
         let node_selector = ''
         
-        if (tag_name == 'body') return return_value//this.getFullSelector(selectors)
+        if (tag_name == 'body') return prepared_selectors//this.getFullSelector(selectors)
         if (card_selector_found) {
             // console.log('1')
             if (selectors[0].length > 0 && document.querySelectorAll(selectors[0].join('>')).length == 1)
-                return return_value//this.getFullSelector(selectors)
+                return prepared_selectors//this.getFullSelector(selectors)
             
             node_selector = class_selector + nth_selector
             selectors[0].unshift(tag_name + node_selector)
         }
-        else if (skip > 0 || node.parentNode.querySelectorAll(this.getFullSelector(selectors)).length == 1){
+        else if (skip > 0 || node.parentNode.querySelectorAll(this.getFullSelector(prepared_selectors)).length == 1){
             // console.log('2')
             node_selector = class_selector + nth_selector
             selectors[2].unshift(tag_name + node_selector)
         }
-        else if (document.querySelectorAll(this.getFullSelector(selectors)).length > 1){
+        else if (document.querySelectorAll(this.getFullSelector(prepared_selectors)).length > 1){
             // console.log('3')
             node_selector = class_selector
             card_selector_found = true
