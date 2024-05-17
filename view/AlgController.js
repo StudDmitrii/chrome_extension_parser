@@ -1,0 +1,6 @@
+class AlgController{
+
+    loadAlg(){}
+    
+    saveAlg(){}
+}

@@ -13,7 +13,8 @@
         "activeTab",
         "scripting",
         "sidePanel",
-        "storage"
+        "storage",
+        "unlimitedStorage"
     ],
     "host_permissions": [
         "<all_urls>"

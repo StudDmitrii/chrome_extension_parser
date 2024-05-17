@@ -10,10 +10,10 @@ btn_hand_sel.addEventListener('click', hand_selection)
 btn_auto_sel.addEventListener('click', auto_selection)
 
 chrome.runtime.onMessage.addListener((req, sender, sendMessage)=>{
-    if (req.selector){
-        const el = document.createElement('p')
-        el.innerHTML = req.selector
-        document.body.appendChild(el)
+    if (req.selectors){
+        let p = document.createElement('p')
+        p.innerText = req.selectors
+        document.body.appendChild(p)
     }
 })
 

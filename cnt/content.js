@@ -1,65 +1,76 @@
 
 chrome.runtime.onMessage.addListener((req, sender, sendMessage)=>{
     if (req == 'hand_selection'){
+        document.removeEventListener('click', getElementByClick)
         document.addEventListener('click', getElementByClick)
     }
-    else if (req == 'auto_selection'){
+    if (req == 'auto_selection'){
         //TODO
+    }
+    if (req == 'stop_hand_selecion'){
+        document.removeEventListener('click', getElementByClick)
     }
 })
 
 async function getElementByClick(event){
-    const target = event.target.innerText
-
-    //сделать нахождение селектора для элемента и его возвращать пользователю
-    const selector = getSelector(event.target)
-    const inners = document.querySelectorAll(selector)
-    for (let i = 0; i < inners.length; i++) {
-        console.log(inners[i].innerText)
-    }
-    chrome.runtime.sendMessage({selector})
+    const [card_container, card, card_element] = SelectorManager.getSelector(event.target)
+    const each_card_element = document.querySelectorAll(SelectorManager.getFullSelector([card_container, card, card_element]))
+    //const each_card = document.querySelectorAll(SelectorManager.getFullSelector([card_container, card]))
+    PageStyler.styleElements(each_card_element, 'blue')
+    //PageStyler.styleElements(each_card, 'red')
+    await chrome.runtime.sendMessage({selectors: [card_container, card, card_element]})
 }
 
-function getSelector(node, node_list=[], selectors=[[],[],[]], skip=1, li_found=false){
+class PageStyler {
+    static styleElements(elements, color){
+        for (let elem of elements){
+            elem.style.cssText = `
+            border: 2px solid ${color};
+            `
+        }
+    }
+}
 
-    node_list.unshift(node)
+class SelectorManager {
+    static getSelector(node, node_list=[], selectors=[[],[],[]], skip=1, card_selector_found=false){
 
-    const tag_name = node.tagName.toLowerCase()
-    const class_selector = (node.className) ? '.' + node.className.split(' ').join('.') : ''
-    const nth_selector = `:nth-child(${getNodeIndex(node)})`
-    let node_selector = ''
+        const return_value = selectors.map((el)=>el.join('>')) // global_selector, card_selector, element_selector
+        node_list.unshift(node)
     
-    if (tag_name == 'body') return full_selector(selectors) //good end
-    if (li_found) {
-        // console.log('1')
-        if (selectors[0].length > 0 && document.querySelectorAll(selectors[0].join('>')).length == 1)
-            return full_selector(selectors) //best end
+        const tag_name = node.tagName.toLowerCase()
+        const class_selector = (node.className) ? '.' + node.className.toString().trim().split(' ').join('.') : ''
+        const nth_selector = `:nth-child(${getNodeIndex(node)})`
+        let node_selector = ''
         
-        node_selector = class_selector + nth_selector
-        selectors[0].unshift(tag_name + node_selector)
+        if (tag_name == 'body') return return_value//this.getFullSelector(selectors)
+        if (card_selector_found) {
+            // console.log('1')
+            if (selectors[0].length > 0 && document.querySelectorAll(selectors[0].join('>')).length == 1)
+                return return_value//this.getFullSelector(selectors)
+            
+            node_selector = class_selector + nth_selector
+            selectors[0].unshift(tag_name + node_selector)
+        }
+        else if (skip > 0 || node.parentNode.querySelectorAll(this.getFullSelector(selectors)).length == 1){
+            // console.log('2')
+            node_selector = class_selector + nth_selector
+            selectors[2].unshift(tag_name + node_selector)
+        }
+        else if (document.querySelectorAll(this.getFullSelector(selectors)).length > 1){
+            // console.log('3')
+            node_selector = class_selector
+            card_selector_found = true
+            selectors[1].unshift(tag_name + node_selector)
+        }
+        // console.log('up')
+        return this.getSelector(node.parentNode, node_list, selectors, skip-1, card_selector_found) //next
+    
+        function getNodeIndex(el){
+            return [...el.parentNode.children].indexOf(el) + 1
+        }
     }
-    else if (skip > 0 || node.parentNode.querySelectorAll(full_selector(selectors)).length == 1){
-        // console.log('2')
-        node_selector = class_selector + nth_selector
-        selectors[2].unshift(tag_name + node_selector)
-    }
-    else if (document.querySelectorAll(full_selector(selectors)).length > 1){
-        // console.log('3')
-        node_selector = class_selector
-        li_found = true
-        selectors[1].unshift(tag_name + node_selector)
-    }
-    // console.log('up')
-    return getSelector(node.parentNode, node_list, selectors, skip-1, li_found) //next
 
-    function getNodeIndex(el){
-        return [...el.parentNode.children].indexOf(el) + 1
-    }
-
-    function full_selector(selectors2){
-        let sel = [selectors2[0].join(' > '), selectors2[1].join(' > '), selectors2[2].join(' > ')]
-        sel = sel.filter(Boolean)
-        sel = sel.join(' > ')
-        return sel
+    static getFullSelector(selectors){
+        return selectors.filter(el=>el.length==0?false:true).join(' > ')
     }
 }
